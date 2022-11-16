@@ -2,6 +2,7 @@ package com.fox.mysimplenotesexample
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +15,6 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +43,12 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 
+    fun myLog(message:Any?) {
+        Log.d(TAG, "Main Activity: $message")
+    }
+
     companion object {
-        var notes = ArrayList<Note>()
+        const val TAG = "myApp"
+       val notes = arrayListOf<Note>()
     }
 }
