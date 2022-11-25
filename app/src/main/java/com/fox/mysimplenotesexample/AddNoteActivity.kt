@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.core.view.get
 import com.fox.mysimplenotesexample.databinding.ActivityAddNoteBinding
 import kotlin.properties.Delegates
@@ -30,6 +31,7 @@ class AddNoteActivity : AppCompatActivity() {
         binding.rbPriority3.setOnClickListener {
             priority = 3
         }
+
 
 
         binding.btnSaveNote.setOnClickListener {

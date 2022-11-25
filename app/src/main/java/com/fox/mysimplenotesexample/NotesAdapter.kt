@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
 import com.google.android.material.color.MaterialColors.getColor
@@ -17,7 +18,6 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
         return NotesViewHolder(binding)
     }
 
-
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
         with(holder) {
             with(notesList[position]) {
@@ -25,11 +25,25 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
                 binding.tvDescription.text = description
                 binding.tvDayOfWeek.text = dayOfWeek
                 determineTheImportance(holder, priority)
+//                binding.root.setOnLongClickListener {
+//                    if (holder != null) {
+//                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
+//                    }
+//                    return@setOnLongClickListener true
+//                }
+               holder.itemView.setOnClickListener {
+                   Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
+               }
+                holder.itemView.setOnLongClickListener {
+                    if (holder != null) {
+                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    return@setOnLongClickListener true
+                }
             }
         }
-
     }
-
 
     fun determineTheImportance(holder: NotesViewHolder, priority: Int) {
         with(holder) {
@@ -44,6 +58,7 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
         }
 
     }
+
 
     fun myLog(message: Any?) {
         Log.d(TAG, "$message")
