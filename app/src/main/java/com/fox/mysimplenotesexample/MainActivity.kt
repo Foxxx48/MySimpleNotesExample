@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.fox.mysimplenotesexample.databinding.ActivityMainBinding
 
@@ -15,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
 
-    val myCustomObject = MyCustomObject()
+    val adapter = NotesAdapter(notes)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
         }
 
-        val adapter = NotesAdapter(notes)
+
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         binding.rvNotes.adapter = adapter
 
@@ -41,13 +43,47 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        myCustomObject.setOnMyCustomObjectListener(object : MyCustomObject.MyCustomObjectListener {
-            override fun onObjectReady() {
-                Toast.makeText(this@MainActivity, "Hello!", Toast.LENGTH_SHORT).show()
+
+        adapter.setOnMyCustomObjectListener(object : NotesAdapter.MyCustomObjectListener {
+            override fun onObjectClick(position: Int) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Click at position: $position",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            override fun onObjectLongClick(position: Int) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Long click at position: $position",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
 
+        val itemTouchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
 
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                removeItem(viewHolder.adapterPosition)
+            }
+
+        })
+
+        itemTouchHelper.attachToRecyclerView(binding.rvNotes)
+    }
+
+    private fun removeItem(position: Int) {
+        notes.removeAt(position)
+        adapter.notifyDataSetChanged()
     }
 
 

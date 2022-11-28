@@ -1,16 +1,23 @@
 package com.fox.mysimplenotesexample
 
-import android.annotation.SuppressLint
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
-import com.google.android.material.color.MaterialColors.getColor
 
 class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesViewHolder>() {
+
+    interface MyCustomObjectListener {
+        fun onObjectClick(position: Int)
+        fun onObjectLongClick(position: Int)
+    }
+
+    var myNoteClickListener: MyCustomObjectListener? = null
+
+    fun setOnMyCustomObjectListener(listener: MyCustomObjectListener?) {
+        this.myNoteClickListener = listener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         val binding = NoteItemBinding
@@ -25,22 +32,30 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
                 binding.tvDescription.text = description
                 binding.tvDayOfWeek.text = dayOfWeek
                 determineTheImportance(holder, priority)
+                holder.itemView.setOnClickListener {
+                    myNoteClickListener?.onObjectClick(position)
+                }
+
+                holder.itemView.setOnLongClickListener {
+                    myNoteClickListener?.onObjectLongClick(position)
+                    return@setOnLongClickListener true
+                }
 //                binding.root.setOnLongClickListener {
 //                    if (holder != null) {
 //                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
 //                    }
 //                    return@setOnLongClickListener true
 //                }
-               holder.itemView.setOnClickListener {
-                   Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
-               }
-                holder.itemView.setOnLongClickListener {
-                    if (holder != null) {
-                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                    return@setOnLongClickListener true
-                }
+//               holder.itemView.setOnClickListener {
+//                   Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
+//               }
+//                holder.itemView.setOnLongClickListener {
+//                    if (holder != null) {
+//                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT)
+//                            .show()
+//                    }
+//                    return@setOnLongClickListener true
+//                }
             }
         }
     }
