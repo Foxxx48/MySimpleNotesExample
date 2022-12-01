@@ -3,6 +3,7 @@ package com.fox.mysimplenotesexample
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -19,52 +20,25 @@ class MainActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
 
-    private lateinit var adapter :NotesAdapter
+    private lateinit var adapter: NotesAdapter
+
+    private val notes = mutableListOf<Note>()
+
+    private lateinit var dataBase: SQLiteDatabase
 
 
-    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val dbHelper = NotesDBHelper(this)
-        var dataBase = dbHelper.writableDatabase
+        dataBase = dbHelper.writableDatabase
 
-//        if (notes.isEmpty()) {
-//            notes.add(Note("Парикмахер", "Сделать прическу", "Понедельник", 2))
-//            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
-//            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
-//            notes.add(Note("Стоматолог", "Вылечить зубы", "Понедельник", 2))
-//            notes.add(Note("Парикмахер", "Сделать прическу к выпускному", "Среда", 1))
-//            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
-//            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
-//        }
-//
-//        for (note in notes) {
-//            val contentValues = ContentValues()
-//            contentValues.put(NotesContract.NotesEntry.COLUMN_TITLE, note.title)
-//            contentValues.put(NotesContract.NotesEntry.COLUMN_DESCRIPTION, note.description)
-//            contentValues.put(NotesContract.NotesEntry.COLUMN_DAY_OF_WEEK, note.dayOfWeek)
-//            contentValues.put(NotesContract.NotesEntry.COLUMN_PRIORITY, note.priority)
-//            dataBase.insert(NotesContract.NotesEntry.TABLE_NAME, null, contentValues)
-//        }
+        getData()
 
-        val notesFromDb = ArrayList<Note>()
-        val cursor = dataBase.query(NotesContract.NotesEntry.TABLE_NAME,null,null, null, null, null,null)
-        while (cursor.moveToNext()) {
-            val title = cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_TITLE))
-            val description =
-                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DESCRIPTION))
-            val dayOfWeek =
-                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DAY_OF_WEEK))
-            val priority = cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_PRIORITY))
-            val note = Note(title, description, dayOfWeek, priority)
-            notesFromDb.add(note)
-        }
-        cursor.close()
 
-        adapter = NotesAdapter(notesFromDb)
+        adapter = NotesAdapter(notes)
 
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         binding.rvNotes.adapter = adapter
@@ -73,7 +47,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AddNoteActivity::class.java)
             startActivity(intent)
         }
-
 
         adapter.setOnMyCustomObjectListener(object : NotesAdapter.MyCustomObjectListener {
             override fun onObjectClick(position: Int) {
@@ -113,8 +86,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun removeItem(position: Int) {
-        notes.removeAt(position)
+        val id = notes[position].id
+        val where = NotesContract._ID + " =?"
+        val whereArgs = arrayOf(id.toString())
+        dataBase.delete(NotesContract.TABLE_NAME, where, whereArgs)
+        getData()
         adapter.notifyDataSetChanged()
+    }
+
+    @SuppressLint("Range")
+    private fun getData() {
+        notes.clear()
+        val cursor =
+            dataBase.query(NotesContract.TABLE_NAME, null, null, null, null, null, NotesContract.COLUMN_DAY_OF_WEEK)
+        while (cursor.moveToNext()) {
+            val id = cursor.getInt(cursor.getColumnIndex(NotesContract._ID))
+            val title = cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_TITLE))
+            val description =
+                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DESCRIPTION))
+            val dayOfWeek =
+                cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_DAY_OF_WEEK))
+            val priority = cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_PRIORITY))
+            val note = Note(id, title, description, dayOfWeek, priority)
+            notes.add(note)
+        }
+        cursor.close()
     }
 
 
@@ -129,6 +125,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "myApp"
-        val notes = arrayListOf<Note>()
+
     }
 }

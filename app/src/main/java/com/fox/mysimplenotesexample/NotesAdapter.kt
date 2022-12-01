@@ -1,12 +1,13 @@
 package com.fox.mysimplenotesexample
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
 
-class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesViewHolder>() {
+class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHolder>() {
 
     interface MyCustomObjectListener {
         fun onObjectClick(position: Int)
@@ -30,7 +31,8 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
             with(notesList[position]) {
                 binding.tvNoteTitle.text = title
                 binding.tvDescription.text = description
-                binding.tvDayOfWeek.text = dayOfWeek
+                binding.tvDayOfWeek.text = getDaysAsString(holder.itemView.context, dayOfWeek)
+                myLog(dayOfWeek)
                 determineTheImportance(holder, priority)
                 holder.itemView.setOnClickListener {
                     myNoteClickListener?.onObjectClick(position)
@@ -58,6 +60,21 @@ class NotesAdapter(var notesList: ArrayList<Note>) : RecyclerView.Adapter<NotesV
 //                }
             }
         }
+    }
+
+    fun getDaysAsString(context: Context, position: Int): String {
+      return when(position + 1) {
+            1 -> context.getString(R.string.monday)
+            2 -> context.getString(R.string.tuesday)
+            3 -> context.getString(R.string.wednesday)
+            4 -> context.getString(R.string.thursday)
+            5 -> context.getString(R.string.friday)
+            6 -> context.getString(R.string.saturday)
+            7 -> context.getString(R.string.sunday)
+          else -> {
+              "Wrong Day"
+          }
+      }
     }
 
     fun determineTheImportance(holder: NotesViewHolder, priority: Int) {

@@ -6,11 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper
 
 class NotesDBHelper(context: Context?) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(NotesContract.NotesEntry.CREATE_COMMAND)
+        db.execSQL(NotesContract.CREATE_COMMAND)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL(NotesContract.NotesEntry.DROP_COMMAND)
+        db.execSQL(NotesContract.DROP_COMMAND)
         onCreate(db)
     }
 
