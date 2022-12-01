@@ -1,5 +1,7 @@
 package com.fox.mysimplenotesexample
 
+import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,23 +19,52 @@ class MainActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
 
-    val adapter = NotesAdapter(notes)
+    private lateinit var adapter :NotesAdapter
 
 
+    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (notes.isEmpty()) {
-            notes.add(Note("Парикмахер", "Сделать прическу", "Понедельник", 2))
-            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
-            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
-            notes.add(Note("Стоматолог", "Вылечить зубы", "Понедельник", 2))
-            notes.add(Note("Парикмахер", "Сделать прическу к выпускному", "Среда", 1))
-            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
-            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
-        }
 
+        val dbHelper = NotesDBHelper(this)
+        var dataBase = dbHelper.writableDatabase
+
+//        if (notes.isEmpty()) {
+//            notes.add(Note("Парикмахер", "Сделать прическу", "Понедельник", 2))
+//            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
+//            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
+//            notes.add(Note("Стоматолог", "Вылечить зубы", "Понедельник", 2))
+//            notes.add(Note("Парикмахер", "Сделать прическу к выпускному", "Среда", 1))
+//            notes.add(Note("Баскетбол", "Игра со школьной командой", "Вторник", 3))
+//            notes.add(Note("Магазин", "Купить новые джинсы", "Понедельник", 3))
+//        }
+//
+//        for (note in notes) {
+//            val contentValues = ContentValues()
+//            contentValues.put(NotesContract.NotesEntry.COLUMN_TITLE, note.title)
+//            contentValues.put(NotesContract.NotesEntry.COLUMN_DESCRIPTION, note.description)
+//            contentValues.put(NotesContract.NotesEntry.COLUMN_DAY_OF_WEEK, note.dayOfWeek)
+//            contentValues.put(NotesContract.NotesEntry.COLUMN_PRIORITY, note.priority)
+//            dataBase.insert(NotesContract.NotesEntry.TABLE_NAME, null, contentValues)
+//        }
+
+        val notesFromDb = ArrayList<Note>()
+        val cursor = dataBase.query(NotesContract.NotesEntry.TABLE_NAME,null,null, null, null, null,null)
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_TITLE))
+            val description =
+                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DESCRIPTION))
+            val dayOfWeek =
+                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DAY_OF_WEEK))
+            val priority = cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_PRIORITY))
+            val note = Note(title, description, dayOfWeek, priority)
+            notesFromDb.add(note)
+        }
+        cursor.close()
+
+        adapter = NotesAdapter(notesFromDb)
 
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         binding.rvNotes.adapter = adapter
