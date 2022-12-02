@@ -1,10 +1,12 @@
-package com.fox.mysimplenotesexample
+package com.fox.mysimplenotesexample.presentation.adapter
 
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.fox.mysimplenotesexample.R
+import com.fox.mysimplenotesexample.data.Note
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
 
 class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHolder>() {

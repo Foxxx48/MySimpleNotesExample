@@ -1,4 +1,4 @@
-package com.fox.mysimplenotesexample
+package com.fox.mysimplenotesexample.presentation.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
