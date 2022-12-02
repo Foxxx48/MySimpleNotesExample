@@ -24,19 +24,13 @@ class MainActivity : AppCompatActivity() {
 
     private val notes = mutableListOf<Note>()
 
-    private lateinit var dataBase: SQLiteDatabase
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val dbHelper = NotesDBHelper(this)
-        dataBase = dbHelper.writableDatabase
-
-        getData()
-
 
         adapter = NotesAdapter(notes)
 
@@ -86,33 +80,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun removeItem(position: Int) {
-        val id = notes[position].id
-        val where = NotesContract._ID + " =?"
-        val whereArgs = arrayOf(id.toString())
-        dataBase.delete(NotesContract.TABLE_NAME, where, whereArgs)
-        getData()
+
         adapter.notifyDataSetChanged()
     }
-
-    @SuppressLint("Range")
-    private fun getData() {
-        notes.clear()
-        val cursor =
-            dataBase.query(NotesContract.TABLE_NAME, null, null, null, null, null, NotesContract.COLUMN_DAY_OF_WEEK)
-        while (cursor.moveToNext()) {
-            val id = cursor.getInt(cursor.getColumnIndex(NotesContract._ID))
-            val title = cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_TITLE))
-            val description =
-                cursor.getString(cursor.getColumnIndex(NotesContract.COLUMN_DESCRIPTION))
-            val dayOfWeek =
-                cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_DAY_OF_WEEK))
-            val priority = cursor.getInt(cursor.getColumnIndex(NotesContract.COLUMN_PRIORITY))
-            val note = Note(id, title, description, dayOfWeek, priority)
-            notes.add(note)
-        }
-        cursor.close()
-    }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -125,6 +95,5 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "myApp"
-
     }
 }

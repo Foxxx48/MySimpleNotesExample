@@ -16,17 +16,10 @@ class AddNoteActivity : AppCompatActivity() {
 
     var priority by Delegates.notNull<Int>()
 
-    lateinit var dbHelper: NotesDBHelper
-    lateinit var dataBase: SQLiteDatabase
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        dbHelper = NotesDBHelper(this)
-
-        dataBase = dbHelper.writableDatabase
 
         binding.rbPriority1.setOnClickListener {
             priority = 1
@@ -55,7 +48,7 @@ class AddNoteActivity : AppCompatActivity() {
                 contentValues.put(NotesContract.COLUMN_DAY_OF_WEEK, dayOfWeek)
                 contentValues.put(NotesContract.COLUMN_PRIORITY, priority)
 
-                dataBase.insert(NotesContract.TABLE_NAME, null, contentValues)
+
 
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
