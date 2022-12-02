@@ -1,18 +1,23 @@
-package com.fox.mysimplenotesexample
+package com.fox.mysimplenotesexample.presentation
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import com.fox.mysimplenotesexample.data.AppDatabase
+import com.fox.mysimplenotesexample.data.Note
 import com.fox.mysimplenotesexample.databinding.ActivityMainBinding
+import com.fox.mysimplenotesexample.presentation.adapter.NotesAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,17 +26,20 @@ class MainActivity : AppCompatActivity() {
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
 
     private lateinit var adapter: NotesAdapter
+    private lateinit var database: AppDatabase
 
-    private val notes = mutableListOf<Note>()
-
-
-
+    private var notes = mutableListOf<Note>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        database = AppDatabase.getInstance(application)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            getData()
+        }
         adapter = NotesAdapter(notes)
 
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
@@ -71,17 +79,27 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                removeItem(viewHolder.adapterPosition)
-            }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    removeItem(viewHolder.adapterPosition)
+                }
 
+            }
         })
 
         itemTouchHelper.attachToRecyclerView(binding.rvNotes)
     }
 
-    private fun removeItem(position: Int) {
 
-        adapter.notifyDataSetChanged()
+    private suspend fun removeItem(position: Int) {
+        database.notesDao().deleteNote(position)
+        getData()
+    }
+
+    private fun getData() {
+        val notesFromDb = database.notesDao().getNotesList()
+        notes.clear()
+        notes.addAll(notesFromDb)
+
     }
 
     override fun onDestroy() {

@@ -1,13 +1,19 @@
-package com.fox.mysimplenotesexample
+package com.fox.mysimplenotesexample.presentation
 
 import android.content.ContentValues
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.fox.mysimplenotesexample.NotesContract
+import com.fox.mysimplenotesexample.data.AppDatabase
+import com.fox.mysimplenotesexample.data.Note
 import com.fox.mysimplenotesexample.databinding.ActivityAddNoteBinding
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 import kotlin.properties.Delegates
 
 class AddNoteActivity : AppCompatActivity() {
@@ -16,10 +22,14 @@ class AddNoteActivity : AppCompatActivity() {
 
     var priority by Delegates.notNull<Int>()
 
+    lateinit var database: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        database = AppDatabase.getInstance(this.application)
 
         binding.rbPriority1.setOnClickListener {
             priority = 1
@@ -42,14 +52,15 @@ class AddNoteActivity : AppCompatActivity() {
             val dayOfWeek = binding.spinnerDayOfWeek.selectedItemId
 
             if (isField(title, description)) {
-                val contentValues = ContentValues()
-                contentValues.put(NotesContract.COLUMN_TITLE, title)
-                contentValues.put(NotesContract.COLUMN_DESCRIPTION, description)
-                contentValues.put(NotesContract.COLUMN_DAY_OF_WEEK, dayOfWeek)
-                contentValues.put(NotesContract.COLUMN_PRIORITY, priority)
-
-
-
+                val note = Note(
+                    title = title,
+                    description = description,
+                    dayOfWeek = dayOfWeek.toInt(),
+                    priority = priority
+                )
+                lifecycleScope.launch {
+                    database.notesDao().addNote(note)
+                }
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
 //            onBackPressed()
