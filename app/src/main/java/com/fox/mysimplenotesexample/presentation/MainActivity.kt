@@ -1,6 +1,5 @@
 package com.fox.mysimplenotesexample.presentation
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,11 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.fox.mysimplenotesexample.data.AppDatabase
-import com.fox.mysimplenotesexample.data.Note
+import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.ActivityMainBinding
 import com.fox.mysimplenotesexample.presentation.adapter.NotesAdapter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -25,10 +23,10 @@ class MainActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw RuntimeException("ActivityMainBinding = null")
 
-    private lateinit var adapter: NotesAdapter
+    private lateinit var notesAdapter: NotesAdapter
     private lateinit var database: AppDatabase
 
-    private var notes = mutableListOf<Note>()
+    private var notes = mutableListOf<NoteDbModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,17 +38,17 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             getData()
         }
-        adapter = NotesAdapter(notes)
+        notesAdapter = NotesAdapter(notes)
 
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
-        binding.rvNotes.adapter = adapter
+        binding.rvNotes.adapter = notesAdapter
 
         binding.floatingActionButton.setOnClickListener {
             val intent = Intent(this, AddNoteActivity::class.java)
             startActivity(intent)
         }
 
-        adapter.setOnMyCustomObjectListener(object : NotesAdapter.MyCustomObjectListener {
+        notesAdapter.setOnMyCustomObjectListener(object : NotesAdapter.MyCustomObjectListener {
             override fun onObjectClick(position: Int) {
                 Toast.makeText(
                     this@MainActivity,
@@ -80,9 +78,10 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    removeItem(viewHolder.adapterPosition)
+                    val item = notesAdapter.currentList[viewHolder.adapterPosition]
+//                    myLog(item)
+                    removeItem(item)
                 }
-
             }
         })
 
@@ -90,8 +89,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private suspend fun removeItem(position: Int) {
-        database.notesDao().deleteNote(position)
+    private suspend fun removeItem(note: NoteDbModel) {
+        database.notesDao().deleteNote(note)
         getData()
     }
 
