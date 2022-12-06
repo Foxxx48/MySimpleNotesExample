@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.fox.mysimplenotesexample.data.AppDatabase
 import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.ActivityAddNoteBinding
+import com.fox.mysimplenotesexample.domain.Note
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
@@ -16,16 +18,16 @@ class AddNoteActivity : AppCompatActivity() {
     private var _binding: ActivityAddNoteBinding? = null
     private val binding get() = _binding ?: throw RuntimeException("ActivityAddNoteBinding = null")
 
-    var priority by Delegates.notNull<Int>()
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(AddNoteViewModel::class.java)
+    }
 
-    lateinit var database: AppDatabase
+    var priority by Delegates.notNull<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        database = AppDatabase.getInstance(this.application)
 
         binding.rbPriority1.setOnClickListener {
             priority = 1
@@ -48,15 +50,16 @@ class AddNoteActivity : AppCompatActivity() {
             val dayOfWeek = binding.spinnerDayOfWeek.selectedItemId
 
             if (isField(title, description)) {
-                val note = NoteDbModel(
+                val note = Note(
                     title = title,
                     description = description,
                     dayOfWeek = dayOfWeek.toInt(),
                     priority = priority
                 )
-                lifecycleScope.launch {
-                    database.notesDao().addNote(note)
-                }
+//                lifecycleScope.launch {
+//                    database.notesDao().addNote(note)
+//                }
+                viewModel.addNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
 //            onBackPressed()
