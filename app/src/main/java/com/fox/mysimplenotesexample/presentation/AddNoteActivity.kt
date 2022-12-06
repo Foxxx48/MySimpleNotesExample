@@ -1,19 +1,15 @@
 package com.fox.mysimplenotesexample.presentation
 
-import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.fox.mysimplenotesexample.NotesContract
 import com.fox.mysimplenotesexample.data.AppDatabase
-import com.fox.mysimplenotesexample.data.Note
+import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.ActivityAddNoteBinding
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 import kotlin.properties.Delegates
 
 class AddNoteActivity : AppCompatActivity() {
@@ -52,7 +48,7 @@ class AddNoteActivity : AppCompatActivity() {
             val dayOfWeek = binding.spinnerDayOfWeek.selectedItemId
 
             if (isField(title, description)) {
-                val note = Note(
+                val note = NoteDbModel(
                     title = title,
                     description = description,
                     dayOfWeek = dayOfWeek.toInt(),

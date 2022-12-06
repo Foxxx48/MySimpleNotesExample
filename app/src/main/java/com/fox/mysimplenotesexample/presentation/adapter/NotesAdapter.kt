@@ -4,12 +4,12 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.fox.mysimplenotesexample.R
-import com.fox.mysimplenotesexample.data.Note
+import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
 
-class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHolder>() {
+class NotesAdapter(var notesList: List<NoteDbModel>) : ListAdapter<NoteDbModel, NotesViewHolder>(NoteDiffCallback) {
 
     interface MyCustomObjectListener {
         fun onObjectClick(position: Int)
@@ -34,8 +34,8 @@ class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHo
                 binding.tvNoteTitle.text = title
                 binding.tvDescription.text = description
                 binding.tvDayOfWeek.text = getDaysAsString(holder.itemView.context, dayOfWeek)
-                myLog(dayOfWeek)
                 determineTheImportance(holder, priority)
+
                 holder.itemView.setOnClickListener {
                     myNoteClickListener?.onObjectClick(position)
                 }
@@ -44,22 +44,6 @@ class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHo
                     myNoteClickListener?.onObjectLongClick(position)
                     return@setOnLongClickListener true
                 }
-//                binding.root.setOnLongClickListener {
-//                    if (holder != null) {
-//                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
-//                    }
-//                    return@setOnLongClickListener true
-//                }
-//               holder.itemView.setOnClickListener {
-//                   Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT).show()
-//               }
-//                holder.itemView.setOnLongClickListener {
-//                    if (holder != null) {
-//                        Toast.makeText(holder.itemView.context, "$position", Toast.LENGTH_SHORT)
-//                            .show()
-//                    }
-//                    return@setOnLongClickListener true
-//                }
             }
         }
     }
@@ -90,9 +74,7 @@ class NotesAdapter(var notesList: List<Note>) : RecyclerView.Adapter<NotesViewHo
                 }
             }
         }
-
     }
-
 
     fun myLog(message: Any?) {
         Log.d(TAG, "$message")
