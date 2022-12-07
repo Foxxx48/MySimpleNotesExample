@@ -1,4 +1,4 @@
-package com.fox.mysimplenotesexample.presentation
+package com.fox.mysimplenotesexample.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.fox.mysimplenotesexample.databinding.ActivityMainBinding
 import com.fox.mysimplenotesexample.domain.Note
+import com.fox.mysimplenotesexample.presentation.addnote.AddNoteActivity
 import com.fox.mysimplenotesexample.presentation.adapter.NotesAdapter
+import com.fox.mysimplenotesexample.presentation.editnote.EditNoteActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         notesAdapter = NotesAdapter()
         binding.rvNotes.layoutManager = LinearLayoutManager(this, VERTICAL, false)
         binding.rvNotes.adapter = notesAdapter
-
         setupClickListeners()
         setupSwipeListener()
     }
@@ -66,11 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onObjectLongClick(position: Int) {
-                Toast.makeText(
-                    this@MainActivity,
-                    "Long click at position: $position",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val item = notesAdapter.currentList[position]
+                val intent = EditNoteActivity.newEditInstance(this@MainActivity, item.id )
+                startActivity(intent)
             }
         })
     }

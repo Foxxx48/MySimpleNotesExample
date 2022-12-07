@@ -1,4 +1,4 @@
-package com.fox.mysimplenotesexample.presentation
+package com.fox.mysimplenotesexample.presentation.addnote
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,12 +6,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import com.fox.mysimplenotesexample.data.AppDatabase
-import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.ActivityAddNoteBinding
 import com.fox.mysimplenotesexample.domain.Note
-import kotlinx.coroutines.launch
+import com.fox.mysimplenotesexample.presentation.main.MainActivity
 import kotlin.properties.Delegates
 
 class AddNoteActivity : AppCompatActivity() {
@@ -42,6 +39,8 @@ class AddNoteActivity : AppCompatActivity() {
         }
 
 
+
+
         binding.btnSaveNote.setOnClickListener {
             val title = binding.etNoteTitle.text.toString().trim()
 
@@ -56,9 +55,7 @@ class AddNoteActivity : AppCompatActivity() {
                     dayOfWeek = dayOfWeek.toInt(),
                     priority = priority
                 )
-//                lifecycleScope.launch {
-//                    database.notesDao().addNote(note)
-//                }
+
                 viewModel.addNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)

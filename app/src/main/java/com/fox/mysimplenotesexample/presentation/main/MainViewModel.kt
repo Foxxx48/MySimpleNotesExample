@@ -1,4 +1,4 @@
-package com.fox.mysimplenotesexample.presentation
+package com.fox.mysimplenotesexample.presentation.main
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

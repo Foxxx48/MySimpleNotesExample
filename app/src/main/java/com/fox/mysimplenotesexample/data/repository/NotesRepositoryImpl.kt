@@ -29,7 +29,7 @@ class NotesRepositoryImpl(application: Application) :
     }
 
     override suspend fun editNote(note: Note) {
-        TODO("Not yet implemented")
+        notesDao.updateNote(noteMapper.mapEntityToDbModel(note))
     }
 
     override suspend fun getNote(noteId: Int): Note {
