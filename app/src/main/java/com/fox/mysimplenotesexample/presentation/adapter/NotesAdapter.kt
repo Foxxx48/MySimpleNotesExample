@@ -8,8 +8,9 @@ import androidx.recyclerview.widget.ListAdapter
 import com.fox.mysimplenotesexample.R
 import com.fox.mysimplenotesexample.data.NoteDbModel
 import com.fox.mysimplenotesexample.databinding.NoteItemBinding
+import com.fox.mysimplenotesexample.domain.Note
 
-class NotesAdapter(var notesList: List<NoteDbModel>) : ListAdapter<NoteDbModel, NotesViewHolder>(NoteDiffCallback) {
+class NotesAdapter() : ListAdapter<Note, NotesViewHolder>(NoteDiffCallback) {
 
     interface MyCustomObjectListener {
         fun onObjectClick(position: Int)
@@ -29,27 +30,28 @@ class NotesAdapter(var notesList: List<NoteDbModel>) : ListAdapter<NoteDbModel, 
     }
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
-        with(holder) {
-            with(notesList[position]) {
+        val notesItem = getItem(position)
+        with(notesItem) {
+            with(holder) {
                 binding.tvNoteTitle.text = title
                 binding.tvDescription.text = description
                 binding.tvDayOfWeek.text = getDaysAsString(holder.itemView.context, dayOfWeek)
                 determineTheImportance(holder, priority)
+            }
 
-                holder.itemView.setOnClickListener {
-                    myNoteClickListener?.onObjectClick(position)
-                }
+            holder.itemView.setOnClickListener {
+                myNoteClickListener?.onObjectClick(position)
+            }
 
-                holder.itemView.setOnLongClickListener {
-                    myNoteClickListener?.onObjectLongClick(position)
-                    return@setOnLongClickListener true
-                }
+            holder.itemView.setOnLongClickListener {
+                myNoteClickListener?.onObjectLongClick(position)
+                return@setOnLongClickListener true
             }
         }
     }
 
     fun getDaysAsString(context: Context, position: Int): String {
-      return when(position + 1) {
+        return when (position + 1) {
             1 -> context.getString(R.string.monday)
             2 -> context.getString(R.string.tuesday)
             3 -> context.getString(R.string.wednesday)
@@ -57,10 +59,10 @@ class NotesAdapter(var notesList: List<NoteDbModel>) : ListAdapter<NoteDbModel, 
             5 -> context.getString(R.string.friday)
             6 -> context.getString(R.string.saturday)
             7 -> context.getString(R.string.sunday)
-          else -> {
-              "Wrong Day"
-          }
-      }
+            else -> {
+                "Wrong Day"
+            }
+        }
     }
 
     fun determineTheImportance(holder: NotesViewHolder, priority: Int) {
@@ -80,9 +82,7 @@ class NotesAdapter(var notesList: List<NoteDbModel>) : ListAdapter<NoteDbModel, 
         Log.d(TAG, "$message")
     }
 
-    override fun getItemCount(): Int {
-        return notesList.size
-    }
+
 
     companion object {
         private const val TAG = "myApp"

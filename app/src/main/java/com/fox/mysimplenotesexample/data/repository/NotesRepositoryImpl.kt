@@ -1,14 +1,19 @@
 package com.fox.mysimplenotesexample.data.repository
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.fox.mysimplenotesexample.data.NotesDao
+import com.fox.mysimplenotesexample.data.AppDatabase
 import com.fox.mysimplenotesexample.data.mapper.NoteMapper
 import com.fox.mysimplenotesexample.domain.Note
 import com.fox.mysimplenotesexample.domain.NotesRepository
 
-class NotesRepositoryImpl(private val notesDao: NotesDao, private val noteMapper: NoteMapper) :
+class NotesRepositoryImpl(application: Application) :
     NotesRepository {
+
+    private val notesDao =  AppDatabase.getInstance(application).notesDao()
+    private val noteMapper = NoteMapper()
+
     override suspend fun addNote(note: Note) {
         notesDao.addNote(noteMapper.mapEntityToDbModel(note))
     }
@@ -24,11 +29,12 @@ class NotesRepositoryImpl(private val notesDao: NotesDao, private val noteMapper
     }
 
     override suspend fun editNote(note: Note) {
-        TODO("Not yet implemented")
+        notesDao.updateNote(noteMapper.mapEntityToDbModel(note))
     }
 
     override suspend fun getNote(noteId: Int): Note {
-        TODO("Not yet implemented")
+        val dbModel = notesDao.getNote(noteId)
+        return noteMapper.mapDbModelToEntity(dbModel)
     }
 
 

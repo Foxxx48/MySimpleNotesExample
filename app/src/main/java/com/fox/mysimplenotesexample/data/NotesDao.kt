@@ -15,8 +15,8 @@ interface NotesDao {
     @Query("DELETE FROM notes WHERE id=:noteId")
     suspend fun deleteNote(noteId: Int)
 
-    @Query("SELECT * FROM notes WHERE id=:id LIMIT 1")
-    suspend fun getNote(id: Int): NoteDbModel
+    @Query("SELECT * FROM notes WHERE id=:noteId LIMIT 1")
+    suspend fun getNote(noteId: Int): NoteDbModel
 
     @Update(onConflict = REPLACE)
     suspend fun updateNote(note: NoteDbModel)
